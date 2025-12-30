@@ -387,113 +387,147 @@
         border-color: #dc3545;
         color: #721c24;
       }
-      /* === 模块8 (单题匹配模式) === */
+      /* === 模块8 (段落匹配) - 优化版 === */
       .match-container {
         display: flex;
-        gap: 20px;
-        height: calc(100vh - 200px); /* 让容器充满剩余屏幕 */
-        min-height: 500px;
+        gap: 20px; /* 左右两列的间距 */
+        align-items: flex-start;
       }
-
-      /* 左侧：文章区域 */
-      .match-left {
-        flex: 3; /* 占 60% 宽度 */
-        background: white;
-        border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        overflow-y: auto; /* 内容长时滚动 */
-        border-top: 5px solid var(--primary);
-      }
-
-      /* 右侧：选项列表 */
-      .match-right {
-        flex: 2; /* 占 40% 宽度 */
+      .match-column {
+        flex: 1; /* 左右两列等宽 (50% : 50%) */
         display: flex;
         flex-direction: column;
-        overflow-y: auto; /* 选项多时滚动 */
-        padding-right: 5px; /* 留点空隙给滚动条 */
+        gap: 15px; /* 上下卡片的间距 */
+        min-width: 0; /* 防止flex子项被长文本撑开 */
       }
-
-      .para-badge {
-        display: inline-block;
-        background: #e0e7ff;
-        color: var(--primary);
-        padding: 5px 12px;
-        border-radius: 20px;
+      .match-title {
+        text-align: center;
         font-weight: bold;
+        color: var(--primary);
         margin-bottom: 15px;
-        font-size: 0.9em;
+        font-size: 1.1em;
+        background: #eef2f7;
+        padding: 10px;
+        border-radius: 8px;
       }
-
-      .para-text {
-        font-size: 1.1rem;
-        line-height: 1.8;
-        color: #2c3e50;
-      }
-
-      /* 选项按钮 */
-      .match-option {
+      .match-item {
         background: white;
         border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 10px;
+        border-radius: 10px;
+        padding: 15px;
         cursor: pointer;
-        text-align: left;
         transition: all 0.2s;
         font-size: 0.95em;
-      }
-      .match-option:hover {
-        border-color: var(--primary);
-        background: #f8f9fa;
-      }
-      .match-option.correct {
-        background: #d4edda;
-        border-color: #28a745;
-        color: #155724;
-        font-weight: bold;
-      }
-      .match-option.wrong {
-        background: #f8d7da;
-        border-color: #dc3545;
-        color: #721c24;
-        opacity: 0.7;
-      }
-      .match-option.disabled {
-        pointer-events: none;
-      }
+        position: relative;
 
-      /* 导航控制栏 */
-      .nav-controls {
+        /* 关键修改：固定高度和宽度逻辑 */
+        height: 220px; /* 强制固定高度，视觉整齐 */
+        width: 100%; /* 占满列宽 */
+        box-sizing: border-box;
+
+        /* 内容布局 */
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        background: white;
-        padding: 10px 20px;
-        border-radius: 50px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        flex-direction: column;
+        justify-content: center; /*文字垂直居中*/
+        overflow-y: auto; /* 文字过多时显示滚动条 */
       }
 
-      /* 手机适配 */
+      /* 美化滚动条 (Chrome/Safari) */
+      .match-item::-webkit-scrollbar {
+        width: 6px;
+      }
+      .match-item::-webkit-scrollbar-thumb {
+        background-color: #bdc3c7;
+        border-radius: 3px;
+      }
+
+      .match-item:hover {
+        border-color: #bdc3c7;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+      }
+
+      /* 选中状态 */
+      .match-item.selected {
+        border-color: var(--primary);
+        background: rgba(74, 144, 226, 0.1);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        z-index: 10;
+      }
+
+      /* 匹配成功 */
+      .match-item.matched {
+        border-color: var(--success);
+        background: #d4edda;
+        color: #155724;
+        cursor: default;
+        opacity: 0.7; /* 稍微变淡，突出未完成的项 */
+        transform: none;
+        box-shadow: none;
+      }
+
+      /* 匹配错误动画 */
+      .match-item.error {
+        animation: shake 0.4s;
+        border-color: var(--error);
+        background: #f8d7da;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+      /* === 📱 手机端适配优化 (解决底部遮挡问题) === */
       @media (max-width: 768px) {
-        .match-container {
-          flex-direction: column; /* 上下布局 */
-          height: auto;
-          gap: 15px;
+        /* 1. 限制底部词库的最大高度 */
+        .word-bank {
+          max-height: 30vh; /* 强制限制高度不超过屏幕的 40% */
+          overflow-y: auto; /* 如果单词太多，词库内部滚动，而不是让它无限长 */
+          padding: 10px 10px 20px 10px; /* 减少内边距 */
+          box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* 阴影改小一点 */
         }
-        .match-left {
-          flex: none;
-          max-height: 40vh; /* 限制段落高度，避免占满屏 */
+
+        /* 2. 缩小单词块，让一行能放下更多 */
+        .word-pool {
+          /* 最小宽度从 110px 改为 80px */
+          grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+          gap: 6px; /* 间距变小 */
+          margin-top: 5px;
         }
-        .match-right {
-          flex: none;
-          max-height: 50vh; /* 选项区域高度 */
+
+        .word-chip {
+          height: 40px; /* 高度从 55px 减小到 40px */
+          font-size: 0.85rem; /* 字体改小 */
+          border-radius: 6px;
         }
+
+        /* 3. 调整正文底部留白，确保能滚动到最后一行 */
         body {
-          /* 覆盖之前的 padding 设置，这里稍微调整 */
-          padding-bottom: 50px !important;
+          /* 留白要大于词库的最大高度 (40vh) */
+          padding-bottom: 45vh !important;
+          padding-top: 10px;
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+
+        /* 4. 优化顶部 Tab 按钮，防止换行太乱 */
+        .tab-btn {
+          padding: 6px 12px;
+          font-size: 0.9em;
+          margin-bottom: 4px;
+        }
+
+        /* 5. 填空题的空格也稍微缩小一点 */
+        .sentence-card {
+          padding: 15px;
+          font-size: 1rem;
         }
       }
     </style>
@@ -589,32 +623,19 @@
         <div id="m7-area"></div>
       </div>
       <div id="module-8" class="module">
-        <div
-          class="stats-bar"
-          style="flex-direction: column; gap: 10px; border-radius: 20px"
-        >
-          <div id="m8-unit-selector"></div>
+        <div class="stats-bar">
+          <span>🧩 Unit 2: 匹配段落大意 (25 Pairs)</span>
+          <button class="action-btn" onclick="renderModule8()">🔄 重置</button>
         </div>
-
-        <div class="nav-controls">
-          <button class="action-btn" onclick="prevPara()">⬅️ 上一题</button>
-          <span style="font-weight: bold; color: #555" id="m8-progress"
-            >Unit 2: 1 / 25</span
-          >
-          <button class="action-btn" onclick="nextPara()">下一题 ➡️</button>
-        </div>
-
         <div class="match-container">
-          <div class="match-left">
-            <div id="m8-para-badge" class="para-badge">Paragraph 1</div>
-            <div id="m8-para-text" class="para-text">Loading...</div>
-            <div
-              id="m8-feedback"
-              style="margin-top: 20px; font-weight: bold; display: none"
-            ></div>
+          <div class="match-column" id="m8-left-col">
+            <div class="match-title">Paragraphs (Text)</div>
+            <div id="m8-texts"></div>
           </div>
-
-          <div class="match-right" id="m8-options-list"></div>
+          <div class="match-column" id="m8-right-col">
+            <div class="match-title">Main Ideas (Options)</div>
+            <div id="m8-options"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1188,172 +1209,186 @@
         state.m7.loaded = true;
       }
       // --- 模块8 逻辑 (多单元段落匹配) ---
-      // --- 模块8 逻辑 (单题匹配模式) ---
-
-      // 这里的 state.m8 结构需要稍微变动一下
-      // state.m8 = { loaded: false, currentUnit: "Unit 2", currentIndex: 0, currentUnitData: [], unitOptions: [] };
-
-      function renderModule8(unitName) {
+      function renderModule8(unitName = "Unit 2") {
         if (!db.matchData) return;
 
-        // 如果没有传参，且已有当前单元，保持当前单元；否则默认 Unit 2
-        const targetUnit = unitName || state.m8.currentUnit || "Unit 2";
-
-        // 1. 渲染顶部单元选择按钮 (如果不存在)
+        // 1. 确保顶部按钮组存在且状态正确
+        const statsBar = document.querySelector("#module-8 .stats-bar");
         let btnGroup = document.getElementById("m8-unit-selector");
-        if (!btnGroup.hasChildNodes()) {
+
+        if (!btnGroup) {
+          // 如果按钮组不存在，创建它
+          statsBar.innerHTML = ""; // 清空原有内容
+
+          btnGroup = document.createElement("div");
+          btnGroup.id = "m8-unit-selector";
           btnGroup.style.display = "flex";
           btnGroup.style.gap = "8px";
-          btnGroup.style.flexWrap = "wrap";
-          btnGroup.style.justifyContent = "center";
+          btnGroup.style.flexWrap = "wrap"; // 防止窄屏换行乱掉
 
-          ["Unit 2", "Unit 3", "Unit 4", "Unit 5"].forEach((u) => {
+          // 定义有的单元
+          const units = ["Unit 2", "Unit 3", "Unit 4", "Unit 5"];
+
+          units.forEach((u) => {
             const btn = document.createElement("button");
             btn.className = "action-btn";
-            btn.style.padding = "5px 15px";
-            btn.style.fontSize = "0.9em";
+            btn.style.padding = "4px 12px";
+            btn.style.fontSize = "0.85em";
             btn.textContent = u;
+            // 绑定点击事件
             btn.onclick = () => renderModule8(u);
             btnGroup.appendChild(btn);
           });
+
+          statsBar.appendChild(btnGroup);
+
+          // 添加重置按钮
+          const resetBtn = document.createElement("button");
+          resetBtn.className = "action-btn";
+          resetBtn.style.marginLeft = "auto"; // 靠右
+          resetBtn.style.background = "#e67e22"; // 橙色区分
+          resetBtn.textContent = "🔄 重置";
+          resetBtn.onclick = () => renderModule8(unitName);
+          statsBar.appendChild(resetBtn);
         }
 
-        // 更新按钮高亮
+        // 更新按钮高亮状态
         Array.from(btnGroup.children).forEach((btn) => {
-          btn.style.background =
-            btn.textContent === targetUnit ? "#2980b9" : "#95a5a6";
+          if (btn.textContent === unitName) {
+            btn.style.background = "#2980b9"; // 深蓝高亮
+            btn.style.opacity = "1";
+          } else {
+            btn.style.background = "#95a5a6"; // 灰色非高亮
+            btn.style.opacity = "0.7";
+          }
         });
 
-        // 2. 初始化数据 (如果是切换单元)
-        if (targetUnit !== state.m8.currentUnit || !state.m8.currentUnitData) {
-          state.m8.currentUnit = targetUnit;
-          state.m8.currentIndex = 0; // 重置到第一题
+        // 2. 筛选数据
+        const unitData = db.matchData.filter((item) => item.unit === unitName);
 
-          // 获取该单元所有段落数据
-          state.m8.currentUnitData = db.matchData.filter(
-            (item) => item.unit === targetUnit
-          );
+        // 重置选中状态
+        state.m8.selectedLeft = null;
+        state.m8.matchedCount = 0;
+        state.m8.currentUnit = unitName;
 
-          // 提取该单元所有答案作为选项，并打乱顺序 (固定住，防止每题选项顺序都变)
-          const allAnswers = state.m8.currentUnitData.map(
-            (item) => item.answer
-          );
-          // 去重 (防止有重复选项) 并打乱
-          state.m8.unitOptions = [...new Set(allAnswers)].sort(
-            () => 0.5 - Math.random()
-          );
-        }
+        const leftContainer = document.getElementById("m8-texts");
+        const rightContainer = document.getElementById("m8-options");
+        leftContainer.innerHTML = "";
+        rightContainer.innerHTML = "";
 
-        renderCurrentQuestion();
-        state.m8.loaded = true;
-      }
-
-      function renderCurrentQuestion() {
-        const data = state.m8.currentUnitData;
-        const idx = state.m8.currentIndex;
-
-        // 边界检查
-        if (!data || data.length === 0) {
-          document.getElementById("m8-para-text").textContent =
-            "该单元暂无数据";
+        if (unitData.length === 0) {
+          leftContainer.innerHTML =
+            "<div style='color:#999; padding:20px'>暂无该单元数据</div>";
           return;
         }
 
-        const currentItem = data[idx];
+        // 3. 渲染左侧 (Paragraphs)
+        unitData.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "match-item";
+          div.dataset.id = item.id;
 
-        // 1. 更新进度和段落内容
-        document.getElementById("m8-progress").textContent = `${
-          state.m8.currentUnit
-        }: ${idx + 1} / ${data.length}`;
+          // --- 修复显示乱的问题 ---
+          // 智能提取数字：如果是 u2-1 取 1，如果是 1 直接用 1
+          let displayNum = item.id;
+          if (typeof item.id === "string" && item.id.includes("-")) {
+            displayNum = item.id.split("-")[1];
+          }
 
-        // 智能提取段落号
-        let paraNum = currentItem.id;
-        if (currentItem.id.includes("-"))
-          paraNum = currentItem.id.split("-")[1];
-        document.getElementById(
-          "m8-para-badge"
-        ).textContent = `Paragraph ${paraNum}`;
+          // 使用更加整齐的 HTML 结构
+          div.innerHTML = `
+            <div style="
+                font-weight:bold; 
+                color:var(--primary); 
+                border-bottom:1px solid #eee; 
+                padding-bottom:5px; 
+                margin-bottom:8px;
+                font-size: 1em;">
+                Paragraph ${displayNum}
+            </div>
+            <div style="font-size: 0.95em; color:#34495e; line-height:1.4;">
+                ${item.text}
+            </div>
+          `;
 
-        document.getElementById("m8-para-text").textContent = currentItem.text;
-
-        // 隐藏反馈
-        const feedback = document.getElementById("m8-feedback");
-        feedback.style.display = "none";
-        feedback.className = "";
-
-        // 2. 渲染右侧选项列表
-        const optionsContainer = document.getElementById("m8-options-list");
-        optionsContainer.innerHTML = ""; // 清空
-
-        state.m8.unitOptions.forEach((optText) => {
-          const btn = document.createElement("div");
-          btn.className = "match-option";
-          btn.textContent = optText;
-
-          // 点击事件
-          btn.onclick = () =>
-            checkMatchAnswer(btn, optText, currentItem.answer);
-
-          optionsContainer.appendChild(btn);
+          div.onclick = () => handleLeftClick(div, item.id);
+          leftContainer.appendChild(div);
         });
 
-        // 滚动回顶部
-        document.querySelector(".match-left").scrollTop = 0;
-        document.querySelector(".match-right").scrollTop = 0;
+        // 4. 渲染右侧 (Options) - 随机打乱
+        const shuffledOptions = [...unitData].sort(() => 0.5 - Math.random());
+        shuffledOptions.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "match-item";
+          div.dataset.matchId = item.id;
+
+          // 右侧也稍微美化一下，居中显示
+          div.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:center; height:100%;">
+                ${item.answer}
+            </div>
+          `;
+
+          div.onclick = () => handleRightClick(div, item.id);
+          rightContainer.appendChild(div);
+        });
+
+        state.m8.loaded = true;
       }
 
-      function checkMatchAnswer(btnElement, selectedText, correctText) {
-        // 防止重复点击
-        if (document.querySelector(".match-option.disabled")) return;
+      // --- 补全缺失的点击逻辑 ---
 
-        const allBtns = document.querySelectorAll(".match-option");
+      function handleLeftClick(elem, id) {
+        if (elem.classList.contains("matched")) return;
 
-        // 1. 锁定所有按钮
-        allBtns.forEach((b) => b.classList.add("disabled"));
+        // 清除左侧其他选中
+        document
+          .querySelectorAll("#m8-texts .match-item")
+          .forEach((d) => d.classList.remove("selected"));
 
-        const feedback = document.getElementById("m8-feedback");
-        feedback.style.display = "block";
+        // 选中当前
+        elem.classList.add("selected");
+        state.m8.selectedLeft = { id: id, element: elem };
+      }
 
-        // 2. 判断对错
-        if (selectedText === correctText) {
-          // 答对了
-          btnElement.classList.add("correct");
-          feedback.textContent = "✅ Correct! 回答正确";
-          feedback.style.color = "#2ecc71";
-        } else {
-          // 答错了
-          btnElement.classList.add("wrong");
-          feedback.innerHTML =
-            "❌ Wrong. <br>正确答案已高亮显示 (See highlighted answer).";
-          feedback.style.color = "#e74c3c";
+      function handleRightClick(elem, targetId) {
+        if (elem.classList.contains("matched")) return;
 
-          // 自动找出正确选项并高亮
-          allBtns.forEach((b) => {
-            if (b.textContent === correctText) {
-              b.classList.add("correct");
-              // 自动滚动到正确答案位置
-              b.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-          });
+        if (!state.m8.selectedLeft) {
+          alert("请先点击左侧的段落 (Please select a paragraph first)");
+          return;
         }
-      }
 
-      function prevPara() {
-        if (state.m8.currentIndex > 0) {
-          state.m8.currentIndex--;
-          renderCurrentQuestion();
-        }
-      }
+        const leftId = state.m8.selectedLeft.id;
+        const leftElem = state.m8.selectedLeft.element;
+        // 注意：HTML dataset 里的 matchId 是字符串，如果数据源是数字需要注意转换，这里统一按字符串对比更安全
+        const rightId = elem.dataset.matchId;
 
-      function nextPara() {
-        if (
-          state.m8.currentUnitData &&
-          state.m8.currentIndex < state.m8.currentUnitData.length - 1
-        ) {
-          state.m8.currentIndex++;
-          renderCurrentQuestion();
+        // 对比 ID (转为字符串对比以防万一)
+        if (String(leftId) === String(rightId)) {
+          // 匹配成功
+          leftElem.classList.remove("selected");
+          leftElem.classList.add("matched");
+          elem.classList.add("matched");
+
+          // 可以在这里改变左侧样式，比如变成绿色，表示已完成
+          leftElem.style.borderColor = "#2ecc71";
+          leftElem.querySelector("div").style.color = "#2ecc71"; // 让标题变绿
+
+          state.m8.selectedLeft = null;
+          state.m8.matchedCount++;
+
+          // 检查是否全部完成
+          const totalInUnit = document.querySelectorAll(
+            "#m8-texts .match-item"
+          ).length;
+          if (state.m8.matchedCount === totalInUnit) {
+            setTimeout(() => alert("🎉 太棒了！本单元全部匹配完成！"), 300);
+          }
         } else {
-          alert("已经是最后一题了 (This is the last paragraph)");
+          // 匹配错误
+          elem.classList.add("error");
+          setTimeout(() => elem.classList.remove("error"), 500);
         }
       }
     </script>
