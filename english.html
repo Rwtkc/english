@@ -875,21 +875,31 @@
       }
 
       // --- 模块3 逻辑 (TASK 3 - P178) ---
+      // --- 升级版 initModule3 (支持多选一) ---
       function initModule3() {
         if (!db.task3Data.length) return;
         document.getElementById("word-bank").classList.remove("disabled");
         document.getElementById("bank-msg").textContent =
           "点击单词替换灰色原词";
 
-        // 显示所有题目，不随机
         state.m3.sentences = [...db.task3Data];
         state.m3.userAnswers = {};
 
-        // 词库逻辑：包含所有答案，外加可能得干扰项
         let words = [];
-        state.m3.sentences.forEach((s) => words.push(...s.answers));
-        // 添加额外的单词（根据图片，yields, attempt 等作为干扰项或同义词存在）
-        words.push("yields", "attempt", "underline");
+        state.m3.sentences.forEach((s) => {
+          s.answers.forEach((ans) => {
+            // 关键修改：如果是数组（多选一），就把里面的词都加进词库
+            if (Array.isArray(ans)) {
+              words.push(...ans);
+            } else {
+              words.push(ans);
+            }
+          });
+        });
+
+        // 添加干扰项
+        words.push("attempt", "underline");
+        // 注意：不要再手动加 "generates" 或 "yields" 了，上面代码已经自动加进去了
 
         state.m3.bank = words.sort(() => 0.5 - Math.random());
         renderModule3();
@@ -920,6 +930,7 @@
         renderBank("m3");
       }
 
+      // --- 升级版 checkModule3 (支持多选一) ---
       function checkModule3() {
         let correct = 0,
           total = 0;
@@ -929,6 +940,7 @@
 
         const area = document.getElementById("m3-area");
         area.innerHTML = "";
+
         state.m3.sentences.forEach((q, qIdx) => {
           let html = q.text;
           q.answers.forEach((ans, aIdx) => {
@@ -936,21 +948,39 @@
             const key = `${qIdx}_${aIdx}`;
             const val = state.m3.userAnswers[key];
             let spanHtml = "";
-            if (val === ans) {
+
+            // 关键修改：判断逻辑支持数组
+            let isCorrect = false;
+            let correctText = ""; // 用于显示正确答案文本
+
+            if (Array.isArray(ans)) {
+              // 如果答案是数组，只要用户填的词在数组里就算对
+              isCorrect = ans.includes(val);
+              correctText = ans.join(" / "); // 显示答案时显示 "generates / yields"
+            } else {
+              // 普通单选
+              isCorrect = val === ans;
+              correctText = ans;
+            }
+
+            if (isCorrect) {
               correct++;
               spanHtml = `<span class="blank correct">${val}</span>`;
             } else {
               spanHtml = `<span class="blank wrong">${
                 val || q.origin[aIdx]
-              }</span><span class="correction">(${ans})</span>`;
+              }</span><span class="correction">(${correctText})</span>`;
             }
+
             html = html.replace(`{${aIdx}}`, spanHtml);
           });
+
           const card = document.createElement("div");
           card.className = "sentence-card";
           card.innerHTML = `${qIdx + 1}. ${html}`;
           area.appendChild(card);
         });
+
         showResult(`得分: ${correct} / ${total}`);
       }
 

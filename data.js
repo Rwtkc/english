@@ -311,7 +311,8 @@ const QUIZ_DATABASE = {
     },
     {
       text: "The issue always {0} a great deal of debates among academics.",
-      answers: ["generates"],
+      // 注意这里是双层括号 [[...]]，表示第1个空里，这两个词任选其一都对
+      answers: [["generates", "yields"]],
       origin: ["causes"],
     },
     {
