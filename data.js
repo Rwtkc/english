@@ -337,7 +337,7 @@ const QUIZ_DATABASE = {
     {
       text: "There has been a {0} of interest in how music affects an individual's ability to concentrate.",
       answers: ["considerable"],
-      origin: ["lot"],
+      origin: ["a lot of"],
     },
   ],
   // === 模块 4：模糊语复习 (P216) ===
