@@ -364,8 +364,8 @@ const QUIZ_DATABASE = {
       original:
         "The effect of these small particles is to cool the climate and to partially offset the increasing concentrations of greenhouse gases.",
       revised:
-        "It <strong>suggests that</strong> the effect of these small particles is to cool the climate and to partially offset the <strong>warming of</strong> increasing concentrations of greenhouse gases.",
-      desc: "添加 It suggests that (这表明...)；增加 warming of (更具体地指代温室气体导致的'变暖')。",
+        "It <strong>suggests that</strong> the effect of these small particles is to cool the climate and to partially offset the increasing concentrations of greenhouse gases.",
+      desc: "添加 It suggests that (这表明...)",
     },
     {
       id: 4,
