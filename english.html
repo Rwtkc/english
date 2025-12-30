@@ -484,6 +484,52 @@
           transform: translateX(5px);
         }
       }
+      /* === 📱 手机端适配优化 (解决底部遮挡问题) === */
+      @media (max-width: 768px) {
+        /* 1. 限制底部词库的最大高度 */
+        .word-bank {
+          max-height: 40vh; /* 强制限制高度不超过屏幕的 40% */
+          overflow-y: auto; /* 如果单词太多，词库内部滚动，而不是让它无限长 */
+          padding: 10px 10px 20px 10px; /* 减少内边距 */
+          box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* 阴影改小一点 */
+        }
+
+        /* 2. 缩小单词块，让一行能放下更多 */
+        .word-pool {
+          /* 最小宽度从 110px 改为 80px */
+          grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+          gap: 6px; /* 间距变小 */
+          margin-top: 5px;
+        }
+
+        .word-chip {
+          height: 40px; /* 高度从 55px 减小到 40px */
+          font-size: 0.85rem; /* 字体改小 */
+          border-radius: 6px;
+        }
+
+        /* 3. 调整正文底部留白，确保能滚动到最后一行 */
+        body {
+          /* 留白要大于词库的最大高度 (40vh) */
+          padding-bottom: 45vh !important;
+          padding-top: 10px;
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+
+        /* 4. 优化顶部 Tab 按钮，防止换行太乱 */
+        .tab-btn {
+          padding: 6px 12px;
+          font-size: 0.9em;
+          margin-bottom: 4px;
+        }
+
+        /* 5. 填空题的空格也稍微缩小一点 */
+        .sentence-card {
+          padding: 15px;
+          font-size: 1rem;
+        }
+      }
     </style>
   </head>
   <body>
