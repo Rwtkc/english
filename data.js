@@ -232,7 +232,7 @@ const QUIZ_DATABASE = {
   sentenceData: [
     {
       text: "It is a {0} way to assess the {1} effect of genetically modified foods.",
-      answers: ["novel", "adverse"],
+      answers: ["novel", "advers"],
       origin: ["new", "harmful"],
     },
     {
@@ -352,17 +352,19 @@ const QUIZ_DATABASE = {
     },
     {
       id: 2,
-      original: "It is proved that animals become old because...",
+      original:
+        "It is proved that animals become old because, if they did not, there would not be successive replacement of individuals and hence no evolution.",
       revised:
-        "It <strong>seems to prove</strong> that animals become old because...",
-      desc: "将 is proved (被证明) 改为 seems to prove (似乎证明)，留有余地。",
+        "It <strong>seems to prove</strong> that animals become old because, if they did not, there <strong>were no</strong> successive replacement of individuals and hence no evolution.",
+      desc: "将 is proved 改为 seems to prove (似乎证明)；将 would not be 改为 were no (虚拟语气的变化)。",
     },
     {
       id: 3,
-      original: "The effect of these small particles is to cool the climate...",
+      original:
+        "The effect of these small particles is to cool the climate and to partially offset the increasing concentrations of greenhouse gases.",
       revised:
-        "It <strong>suggests that</strong> the effect of these small particles is to cool the climate...",
-      desc: "添加 It suggests that (这表明...)，避免直接陈述事实。",
+        "It <strong>suggests that</strong> the effect of these small particles is to cool the climate and to partially offset the <strong>warming of</strong> increasing concentrations of greenhouse gases.",
+      desc: "添加 It suggests that (这表明...)；增加 warming of (更具体地指代温室气体导致的'变暖')。",
     },
     {
       id: 4,
